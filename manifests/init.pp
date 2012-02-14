@@ -21,10 +21,12 @@
 #     }
 #
 # [Remember: No empty lines between comments and class definition]
-class rbenv {
+class rbenv ($user="root") {
 
   # Include dependencies
   include git, curl
 
   include rbenv::install
+
+ #create group rbenv?
 }
