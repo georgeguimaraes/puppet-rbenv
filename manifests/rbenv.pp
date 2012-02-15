@@ -58,7 +58,7 @@ class rbenv::install {
 
   # STEP 6
   file { "/usr/local/rbenv":
-    owner => 'deploy',
+    owner => $rbenv::user,
     group => 'deploy',
     ensure => 'directory',
     recurse => true,
