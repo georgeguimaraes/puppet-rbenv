@@ -2,6 +2,6 @@
 include git, curl
 
 # Provide your username here
-$user = "alup"
-$global_ruby = "1.9.2-p290"
+$user = "deploy"
+$global_ruby = "1.9.3-p0"
 include rbenv
