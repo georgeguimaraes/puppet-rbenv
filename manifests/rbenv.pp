@@ -8,7 +8,7 @@ class rbenv::install {
     creates => "/usr/local/rbenv",
     path    => ["/usr/bin", "/usr/sbin"],
     timeout => 100,
-    require => Class['git'],
+    require => Package['git-core'],
   }
 
   # STEP 2
@@ -18,8 +18,20 @@ class rbenv::install {
     group   => $rbenv::user,
     cwd     => "/home/${rbenv::user}",
     onlyif  => "[ -f /home/${rbenv::user}/.bashrc ]", 
-    unless  => "grep .rbenv /home/${rbenv::user}/.bashrc 2>/dev/null",
+    unless  => "grep '/usr/local/rbenv' /home/${rbenv::user}/.bashrc 2>/dev/null",
     path    => ["/bin", "/usr/bin", "/usr/sbin"],
+  }
+
+  # STEP 3
+  exec { "configure RBENV_ROOT":
+    command => 'echo "export RBENV_ROOT=/usr/local/rbenv" >> .bashrc',
+    user    => $rbenv::user,
+    group   => $rbenv::user,
+    cwd     => "/home/${rbenv::user}",
+    onlyif  => "[ -f /home/${rbenv::user}/.bashrc ]", 
+    unless  => "grep 'RBENV_ROOT' /home/${rbenv::user}/.bashrc 2>/dev/null",
+    path    => ["/bin", "/usr/bin", "/usr/sbin"],
+    require => Exec['configure rbenv path']
   }
 
   # STEP 3
@@ -29,8 +41,9 @@ class rbenv::install {
     group   => $rbenv::user,
     cwd     => "/home/${rbenv::user}",
     onlyif  => "[ -f /home/${rbenv::user}/.bashrc ]", 
-    unless  => "grep '.rbenv init -' /home/${rbenv::user}/.bashrc 2>/dev/null",
+    unless  => "grep 'rbenv init -' /home/${rbenv::user}/.bashrc 2>/dev/null",
     path    => ["/bin", "/usr/bin", "/usr/sbin"],
+    require => Exec['configure RBENV_ROOT']
   }
 
   # STEP 4
@@ -42,7 +55,7 @@ class rbenv::install {
     creates => "/usr/local/ruby-build",
     path    => ["/usr/bin", "/usr/sbin"],
     timeout => 100,
-    require => Class['git'],
+    require => [ Exec['checkout rbenv'], Exec['configure rbenv init'] ]
   }
 
   # STEP 5
